@@ -1,5 +1,5 @@
 #include "utility.h"
-#include "lio_sam/cloud_info.h"
+#include "sc_lio_sam/cloud_info.h"
 
 // Velodyne
 struct PointXYZIRT
@@ -79,7 +79,7 @@ private:
     float odomIncreY;
     float odomIncreZ;
 
-    lio_sam::cloud_info cloudInfo;
+    sc_lio_sam::cloud_info cloudInfo;
     double timeScanCur;
     double timeScanEnd;
     std_msgs::Header cloudHeader;
@@ -93,8 +93,8 @@ public:
         subOdom       = nh.subscribe<nav_msgs::Odometry>(odomTopic+"_incremental", 2000, &ImageProjection::odometryHandler, this, ros::TransportHints().tcpNoDelay());
         subLaserCloud = nh.subscribe<sensor_msgs::PointCloud2>(pointCloudTopic, 5, &ImageProjection::cloudHandler, this, ros::TransportHints().tcpNoDelay());
 
-        pubExtractedCloud = nh.advertise<sensor_msgs::PointCloud2> ("lio_sam/deskew/cloud_deskewed", 1);
-        pubLaserCloudInfo = nh.advertise<lio_sam::cloud_info> ("lio_sam/deskew/cloud_info", 1);
+        pubExtractedCloud = nh.advertise<sensor_msgs::PointCloud2> ("sc_lio_sam/deskew/cloud_deskewed", 1);
+        pubLaserCloudInfo = nh.advertise<sc_lio_sam::cloud_info> ("sc_lio_sam/deskew/cloud_info", 1);
 
         allocateMemory();
         resetParameters();
@@ -233,14 +233,14 @@ public:
                 ros::shutdown();
             }
         }   
-
+        
         // check point time
         if (deskewFlag == 0)
         {
             deskewFlag = -1;
-            for (int i = 0; i < (int)currentCloudMsg.fields.size(); ++i)
+            for (auto &field : currentCloudMsg.fields)
             {
-                if (currentCloudMsg.fields[i].name == timeField)
+                if (field.name == "time" || field.name == "t")
                 {
                     deskewFlag = 1;
                     break;
@@ -504,8 +504,8 @@ public:
             if (range < lidarMinRange || range > lidarMaxRange)
                 continue;
 
-            // int rowIdn = laserCloudIn->points[i].ring;
-            int rowIdn = (i % 64) + 1 ; // for MulRan dataset, Ouster OS1-64 .bin file,  giseop 
+            int rowIdn = laserCloudIn->points[i].ring;
+            //int rowIdn = (i % 64) + 1 ; // for MulRan dataset, Ouster OS1-64 .bin file,  giseop 
 
             if (rowIdn < 0 || rowIdn >= N_SCAN)
                 continue;
@@ -572,7 +572,7 @@ public:
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "lio_sam");
+    ros::init(argc, argv, "sc_lio_sam");
 
     ImageProjection IP;
     

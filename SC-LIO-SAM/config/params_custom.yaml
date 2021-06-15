@@ -1,8 +1,8 @@
-sc_lio_sam: # configurations for MulRan dataset
+lio_sam: # configurations for MulRan dataset
 
   # Topics
-  pointCloudTopic: "/os1_points"               # Point cloud data
-  imuTopic: "/imu/data_raw"                         # IMU data
+  pointCloudTopic: "velodyne_points"               # Point cloud data
+  imuTopic: "imu_raw"                         # IMU data
   odomTopic: "odometry/imu"                   # IMU pre-preintegration odometry, same frequency as IMU
   gpsTopic: "odometry/gpsz"                   # GPS odometry topic from navsat, see module_navsat.launch file
 
@@ -14,11 +14,11 @@ sc_lio_sam: # configurations for MulRan dataset
   # Export settings
   savePCD: true                              # https://github.com/TixiaoShan/LIO-SAM/issues/3
   # savePCDDirectory: "/Desktop/data/kaist01/sc-lio-sam/"  # in your home folder, starts and ends with "/".
-  savePCDDirectory: "/Desktop/data/riverside01/sc-lio-sam/"  # in your home folder, starts and ends with "/".
+  savePCDDirectory: "/../../media/mason/backup/rosbag_data/lio_sam_data/output/sc_lio_sam/"  # in your home folder, starts and ends with "/".
 
   # Sensor Settings
-  N_SCAN: 64                                  # number of lidar channel (i.e., 16, 32, 64, 128)
-  Horizon_SCAN: 1024                         # lidar horizontal resolution (Velodyne:1800, Ouster:512,1024,2048)
+  N_SCAN: 16                                  # number of lidar channel (i.e., 16, 32, 64, 128)
+  Horizon_SCAN: 1200                         # lidar horizontal resolution (Velodyne:1800, Ouster:512,1024,2048)
   timeField: "t"                           # point timestamp field, Velodyne - "time", Ouster - "t"
   downsampleRate: 1                         # default: 1. Downsample your data if too many points. i.e., 16 = 64 / 4, 16 = 16 / 1 
 
@@ -28,25 +28,25 @@ sc_lio_sam: # configurations for MulRan dataset
   # imuAccBiasN: 6.4356659353532566e-05 # orig
   # imuGyrBiasN: 3.5640318696367613e-05 # orig
   
-  # IMU Settings (tuned for MulRan)
-  imuAccNoise: 0.009939570888238808e-03
-  imuGyrNoise: 0.005636343949698187e-03
-  imuAccBiasN: 0.64356659353532566e-03
-  imuGyrBiasN: 0.35640318696367613e-03
- 
+  # IMU Settings
+  imuAccNoise: 3.9939570888238808e-03
+  imuGyrNoise: 1.5636343949698187e-03
+  imuAccBiasN: 6.4356659353532566e-05
+  imuGyrBiasN: 3.5640318696367613e-05
   imuGravity: 9.80511
+  imuRPYWeight: 0.01
 
   # Extrinsics (lidar -> IMU, of MulRan dataset)
-  extrinsicTrans: [1.77, -0.00, -0.05]
+  extrinsicTrans: [0.0, 0.0, -0.09]
   extrinsicRot: [-1, 0, 0,
-                  0, -1, 0,
-                  0, 0, 1]
-  extrinsicRPY: [-1,  0, 0,
-                 0, -1, 0,
+                  0, 1, 0,
+                  0, 0, -1]
+  extrinsicRPY: [0,  1, 0,
+                 -1, 0, 0,
                   0, 0, 1]
 
   # LOAM feature threshold
-  edgeThreshold: 1
+  edgeThreshold: 1.0
   surfThreshold: 0.1
   edgeFeatureMinValidNum: 10
   surfFeatureMinValidNum: 100
@@ -61,13 +61,13 @@ sc_lio_sam: # configurations for MulRan dataset
   rotation_tollerance: 1000                     # radians
 
   # CPU Params
-  numberOfCores: 8                              # number of cores for mapping optimization
+  numberOfCores: 4                              # number of cores for mapping optimization
   mappingProcessInterval: 0.15                  # seconds, regulate mapping frequency
 
   # Surrounding map
-  surroundingkeyframeAddingDistThreshold: 1.0   # meters, regulate keyframe adding threshold
-  surroundingkeyframeAddingAngleThreshold: 0.2  # radians, regulate keyframe adding threshold
-  surroundingKeyframeDensity: 1.0               # meters, downsample surrounding keyframe poses   
+  surroundingkeyframeAddingDistThreshold: 0.1   # meters, regulate keyframe adding threshold / origin:1.0
+  surroundingkeyframeAddingAngleThreshold: 0.1  # radians, regulate keyframe adding threshold / origin:0.2
+  surroundingKeyframeDensity: 2.0               # meters, downsample surrounding keyframe poses   
   surroundingKeyframeSearchRadius: 50.0         # meters, within n meters scan-to-map optimization (when loop closure disabled)
 
   # Loop closure
@@ -81,9 +81,9 @@ sc_lio_sam: # configurations for MulRan dataset
 
 
   # Visualization
-  globalMapVisualizationSearchRadius: 50000.0    # meters, global map visualization radius
+  globalMapVisualizationSearchRadius: 1000.0    # meters, global map visualization radius
   globalMapVisualizationPoseDensity: 10.0       # meters, global map visualization keyframe density
-  globalMapVisualizationLeafSize: 0.2           # meters, global map visualization cloud density
+  globalMapVisualizationLeafSize: 1.0           # meters, global map visualization cloud density
 
 
   # GPS Settings
